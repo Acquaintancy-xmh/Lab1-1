@@ -3,448 +3,549 @@ import java.util.*;
 
 //this is lab1,add some files
 //don't talk anymore
-interface lab
-{
-	 digraph createDirectedGraph(String filename);//Éú³ÉÓĞÏòÍ¼ done
-	 void showDirectedGraph(digraph G);//Õ¹Ê¾ÓĞÏòÍ¼ done
-	 String queryBridgeWords(digraph G, String word1, String word2);// ²éÑ¯ÇÅ½Ó´Êdone
-	 String generateNewText(digraph G, String inputText);//¸ù¾İbridge wordÉú³ÉĞÂÎÄ±¾ done
-	 String calcShortestPath(digraph G, String word1, String word2);//¼ÆËãÁ½¸öµ¥´ÊÖ®¼äµÄ×î¶ÌÂ·¾¶ done
-	 String randomWalk(digraph G);//Ëæ»úÓÎ×ßdone
-	}
-class digraph implements lab
-{
-	public String[] refrence;//´æ·Åµ¥´Ê£¬ÒÔÏÂ±êÎªµ¥´Ê½Úµã±àºÅ
-	public int[][] list;//ÓĞÏòÍ¼µÄ¶şÎ¬¾ØÕó
-	public static int[] ifvisited;//·ÃÎÊ±ê¼ÇÊı×é
-	public static int times;//Ëæ»ú·ÃÎÊÊ±µÄÖØ¸´´ÎÊı£¬×÷ÎªÈ«¾Ö±äÁ¿
-	public static int sign;//µ±Ç°Ëæ»úµ½Î»ÖÃ
-	public static int least;//×î¶ÌÂ·¾¶µÄÈ¨ÖµºÏ
- 	public digraph(int i)//¶¨ÒåÒ»¸ö×Ö·û´®Êı×é
-	{
-		this.refrence=new String[i];
-		this.list=new int[i][i];
-	}
-	public static void refreshifvisited(int i)//Ë¢ĞÂ·ÃÎÊÊı×é£¬ÔÚÊ¹ÓÃÖ®Ç°µ÷ÓÃÒ»´Î
-	{
-		ifvisited=new int[i];
-	}
-	public static void refreshtimes()//ÖØÖÃÖØ¸´´ÎÊı£¬ĞèÒªÊ±µ÷ÓÃ
-	{times=0;}
-	public static void refreshleast()//ÖØÖÃ×î¶ÌÂ·¾¶ºÏ
-	{least=0;}
-    public int GetLength()//µÃµ½Êı×éµÄÓĞĞ§³¤¶È
-	{
-		for(int i=0;i<this.refrence.length;i++)
-		{
-			if(this.refrence[i]==null) return i;
-		}
-		return 0;
-	}
-	public boolean IfHaveChild(String str)//ÊÇ·ñ´æÔÚÏàÁÚ±ß£¬´æÔÚ·µ»Øtrue
-	{
-		for (int i=0;i<this.GetLength();i++)
-		{
-			if(this.list[this.GetNum(str)][i]>0) return true;
-		}
-		return false;
-	}
-	public int GetNum(String str)//Í¨¹ı×Ö·û´®²éÕÒ¶ÔÓ¦µÄ±àºÅÖµ
-	{
-		for(int j=0;j<this.GetLength();j++)
-		{   if(this.refrence[j]==null) return -1;
-			if(this.refrence[j].equals(str)==true) return j;
-		}
-		return -1;
-	}
-	public void Add(int i,int j)//½«¶ÔÓ¦µÄÁ½¸ö±àºÅµÄÈ¨Öµ+1£¬±íÊ¾i->jÓĞÒ»ÌõÓĞÏò±ß
-	{
-		this.list[i][j]=this.list[i][j]+1;
-	}
-	public digraph createDirectedGraph(String filename)//´´½¨ÓĞÏòÍ¼
-	{   
-       try//´æÔÚºó½øĞĞÎÄ¼ş²Ù×÷
-       {
-   		   File file=new File(filename);//ÎÄ¼ş´ò¿ª
-           if (!file.exists())//¼ìÑéÊÇ·ñ´æÔÚ
-           {System.err.println("Not Fing the File!\n");}
-           
-    	    String line;
-			String reg = "\\s+";
-			String E ="[a-zA-Z]";
-			String word,preword=null;
-			int index=0;
-			
-			BufferedReader bf = new BufferedReader(new FileReader(file));
-			while((line = bf.readLine())!=null)  //Ò»ĞĞÒ»ĞĞ¶ÁÈ¡
-			{
-				for(int i=0;i<line.length();i++)
-				{
-					char ch = line.charAt(i);
-					String ch1 = String.valueOf(ch);
-					if(!ch1.matches(E))           //½«·ÇÓ¢ÎÄ×ÖÄ¸×Ö·ûÓÃ¿Õ¸ñÈ¡´ú
-						line=line.replace(ch,' ');
-					
-				}
-				String []strs = line.split(reg);
-				for(int i=0;i<strs.length;i++)
-				{
-					word = strs[i];
-				    if(this.GetNum(word.toLowerCase().trim())==-1)//Èç¹ûÃ»ÓĞ´¢´æÕâ¸öµ¥´Ê£¬Ôò´æÈë
-				    { 
-				       this.refrence[index]=(word.toLowerCase().trim());
-				        index++;
-				    }//ÓĞĞ§µ¥´Ê´æÈë²Î¿¼Êı×éÖĞ,Í¬Ê±´óĞ´×ª»»
-				  
-			      if(preword!=null)//Èç¹ûÇ°Ò»µ¥´Ê²»Îª¿Õ£¬ÔòÇ°Ò»µ¥´Êµ½´Ëµ¥´ÊµÄÈ¨Öµ+1
-			      {  
-			         
-			    	  this.Add(this.GetNum(preword.toLowerCase().trim()),this.GetNum(word.toLowerCase().trim()) );
-			      }
-			      preword = word;
-			      //System.out.println(preword);
-				}
-		  }
-		 bf.close();  
-       }
-       catch (Exception e) {
-    	   e.printStackTrace();
-    	  }
-       return this;  
-	}
-	public void printdigraph(digraph G)//²âÊÔÊä³ö
-	{
-		/*Êä³ö²âÊÔÇø*/
-		int index=G.GetLength();
-		System.out.println(index);
-		   for(int z=0;z<index;z++)
-		   { System.out.print("\""+G.refrence[z]+"\""+' ');}
-		     System.out.print('\n');
-		     for (int x=0;x<index;x++)
-		     {
-			   for(int y=0;y<index;y++)
-			   {
-				   System.out.print(G.list[x][y]+" ");
-			   }
-			   System.out.println("\n");
-		    }    		      		    
-    }
-	
-	public String queryBridgeWords(digraph G, String word1, String word2)// ²éÑ¯ÇÅ½Ó´Ê
-	{
-		int index1=G.GetNum(word1);int index2=G.GetNum(word2);
-		if(index1==-1||index2==-1) return "No in";//ÖÁÉÙÓĞÒ»¸ö´Ê²»´æÔÚ
-		else if(G.list[index1][index2]>0) return "No have";//ÏàÁÚÁ½´ÊÎŞÇÅ½Ó´Ê
-		else
-		{			
-			ifvisited[index1]=1;ifvisited[index2]=1;
-			for(int i=0;i<G.GetLength();i++)//ÅĞ¶ÏÊÇ·ñÁ½´Ê¼äÓĞÇÅ½Ó´Ê
-			{
-				if(G.list[index1][i]>0)
-				{					
-						if(G.list[i][index2]>0&&ifvisited[i]==0)//ÓĞÇÒÎ´±»·ÃÎÊ¹ı
-						{
-							ifvisited[i]=1;
-							return G.refrence[i];//Êä³öÓĞĞ§´Ê
-						}
-				}
-			}
-		for(int j=0;j<G.GetLength();j++)//ÅĞ¶ÏÊÇ·ñ³öÏÖ¹ıÓĞĞ§´Ê
-		{
-			if(j==index1||j==index2);
-			else if(ifvisited[j]==1) return "No more";//³öÏÖ¹ı	
-		}
-		return "No have";//Î´³öÏÖ¹ı
-		}
-		
-	}
-	public String generateNewText(digraph G, String inputText)//¸ù¾İbridge wordÉú³ÉĞÂÎÄ±¾ 
-	{
-		String sentence[]=inputText.split("\\s+");//·Ö¸îÊäÈëµÄ×Ö·û´®	
-		String strout=new String();//×îÖÕÊä³öµÄ×Ö·û´®
-		String strbridge;//´æ·Åµ±Ç°ÇÅ½Ó´Ê
-		String strconnect;//µÃ³öµÄÓĞĞ§ÇÅ½Ó´Ê
-		for(int i=0;i<sentence.length-1;i++)
-		{   refreshifvisited(G.GetLength());
-			strout=strout+sentence[i]+" ";
-			strbridge=G.queryBridgeWords(G, sentence[i], sentence[i+1]);
-			if(strbridge.equals("No in")||strbridge.equals("No have")) strconnect=" ";//Èç¹ûÁ½´Ê¼äÎŞÇÅ½Ó´Ê£¬²»ĞèÒª²åÈëĞÂµ¥´Ê
-			else //Èç¹ûÁ½´Ê¼äÓĞÇÅ½Ó´Ê£¬Ëæ»ú²åÈëÒ»¸öÇÅ½Ó´Ê
-			{
-				String[] bridgewords=new String[G.GetLength()];
-                int index=0;
-                Random random=new Random();
-				while(!strbridge.equals("No more"))//Î´ÕÒÈ«ËùÓĞÇÅ½Ó´ÊÊ±
-				{
-					bridgewords[index]=strbridge;
-					index++;
-					strbridge=G.queryBridgeWords(G, sentence[i], sentence[i+1]);
-				}
-				strconnect=bridgewords[random.nextInt(index)]+" ";
-			}
-			strout=strout+strconnect;
-		}
-		strout=strout+sentence[sentence.length-1];
-		return strout;
-		
-	}
-    public String randomWalk(digraph G)//Ëæ»úÓÎ×ß
-	{   int temp;
- 		Random index=new Random();//Éú³ÉÒ»¸ö·¶Î§ÄÚµÄËæ»úÊı
-		temp=index.nextInt(G.GetLength());
-		if(IfHaveChild(G.refrence[sign])==false) return "end";//µ±Ç°½ÚµãÒÑÎŞ×Ó½áµã£¬ÓÖ×ßÓÎ×ß½áÊø
-		if(G.list[sign][temp]>0&&ifvisited[temp]==0)//µ±Ç°×Ö·û´æÔÚÁÚ½Ó×Ö·û²¢ÇÒÎ´±»·ÃÎÊ
-		{
-			ifvisited[temp]=1;//±ê¼Ç·ÃÎÊ
-			//this.sign=temp;
-			//this.refreshtimes();
-			sign=temp;
-			refreshtimes();
-			return G.refrence[temp];//µ±Ç°×Ö·ûÎª¿ÉÊä³ö×Ö·û£¬·µ»Øµ±Ç°×Ö·û
-		}                  //this.sign
-		else if(G.list[sign][temp]>0&&ifvisited[temp]==1&&(times==0||times==1))//µ±Ç°ÒÑ¾­·ÃÎÊ¹ıµ«Î´ÖØ¸´£¬ËµÃ÷Ö»³öÏÖÖØ¸´µ¥´Ê£¬Î´±ØÊÇ³öÏÖÖØ¸´¾ä×Ó£¬¼ÌĞøÓÎ×ß
-		{
-			ifvisited[temp]=1;//±ê¼Ç·ÃÎÊ
-			sign=temp;
-			times++;
-			return refrence[temp];//µ±Ç°×Ö·ûÎª¿ÉÊä³ö×Ö·û£¬·µ»Øµ±Ç°×Ö·û
-		}
-		else if(G.list[sign][temp]>0&&ifvisited[temp]==1&&times==2)//µ±Ç°ÒÑ¾­·ÃÎÊ¹ı²¢ÇÒÒÑÖØ¸´£¬ËµÃ÷³öÏÖÖØ¸´¾ä×Ó£¬ÓÎ×ß½áÊø
-		{
-			return "end";
-		}
-		else//µ±Ç°Éú³ÉËæ»úÊı²»ÊÇÏÂÒ»µ¥´ÊµÄÏÂ±êµ«µ±Ç°×ßµ½µÄ½Úµã»¹ÓĞ×Ó½Úµã£¬ÖØĞÂÖ´ĞĞº¯Êı£¬Ö±µ½Éú³ÉÓĞĞ§ÏÂ±ê
-		{
-			return "continue";
-		}
-	}
-    public void showDirectedGraph(digraph G)//Õ¹Ê¾ÓĞÏòÍ¼
+/**
+ * @author xmh_mac
+ *
+ */
+interface labInterface {
+
+    /**
+     * @param filename
+     *            the input of the whole program.
+     * @return the result.
+     */
+    Digraph createDirectedGraph(String filename);
+
+    /**
+     * @param graphParam
+     *            the input.
+     */
+    void showDirectedGraph(Digraph graphParam); // å±•ç¤ºæœ‰å‘å›¾ done
+
+    /**
+     * @param graphParam
+     *            the input.
+     * @param word1
+     *            the input.
+     * @param word2
+     *            the input.
+     * @return the result.
+     */
+    String queryBridgeWords(Digraph graphParam, String word1, String word2); // æŸ¥è¯¢æ¡¥æ¥è¯
+
+    /**
+     * @param graphParam
+     *            the input.
+     * @param inputText
+     *            the input.
+     * @return String the result.
+     */
+    String generateNewText(Digraph graphParam, String inputText); // æ ¹æ®bridge wordç”Ÿæˆæ–°æ–‡æœ¬
+
+    /**
+     * @param graphParam
+     *            the input.
+     * @param word1
+     *            the input.
+     * @param word2
+     *            the input.
+     * @return String the result.
+     */
+    String calcShortestPath(Digraph graphParam,
+            String word1,
+            String word2); // è®¡ç®—ä¸¤ä¸ªå•è¯ä¹‹é—´çš„æœ€çŸ­è·¯å¾„
+
+    /**
+     * @param graphParam
+     *            the input.
+     * @return String the result.
+     */
+    String randomWalk(Digraph graphParam); // éšæœºæ¸¸èµ°
+}
+
+class Digraph implements labInterface {
+    public String[] refrence;// å­˜æ”¾å•è¯ï¼Œä»¥ä¸‹æ ‡ä¸ºå•è¯èŠ‚ç‚¹ç¼–å·
+    public int[][] list;// æœ‰å‘å›¾çš„äºŒç»´çŸ©é˜µ
+    public static int[] ifvisited;// è®¿é—®æ ‡è®°æ•°ç»„
+    public static int times;// éšæœºè®¿é—®æ—¶çš„é‡å¤æ¬¡æ•°ï¼Œä½œä¸ºå…¨å±€å˜é‡
+    public static int sign;// å½“å‰éšæœºåˆ°ä½ç½®
+    public static int least;// æœ€çŸ­è·¯å¾„çš„æƒå€¼åˆ
+
+    public Digraph(int i)// å®šä¹‰ä¸€ä¸ªå­—ç¬¦ä¸²æ•°ç»„
     {
-    	GraphViz gv = new GraphViz();
-        gv.addln(gv.start_graph());
-        int index=G.GetLength();
-        for(int i=0;i<index;i++)
-        {
-        	for(int j=0;j<index;j++)
-        	{
-        		if(G.list[i][j]>0)
-        		{
-        		    gv.addln(G.refrence[i]+"->"+G.refrence[j]+"[label=\""+G.list[i][j]+"\"];");
-        		   // gv.addln(G.refrence[i]+"->"+G.refrence[j]+"[label=\""+G.list[i][j]+"\",style=\"dashed\"];");
-        		}
-        	}
+        this.refrence = new String[i];
+        this.list = new int[i][i];
+    }
+
+    /**
+     * @param i the integer.
+     */
+    public static void refreshIfVisited(final int i)// åˆ·æ–°è®¿é—®æ•°ç»„ï¼Œåœ¨ä½¿ç”¨ä¹‹å‰è°ƒç”¨ä¸€æ¬¡
+    {
+        ifvisited = new int[i];
+    }
+
+    public static void refreshtimes()// é‡ç½®é‡å¤æ¬¡æ•°ï¼Œéœ€è¦æ—¶è°ƒç”¨
+    {
+        times = 0;
+    }
+
+    public static void refreshleast()// é‡ç½®æœ€çŸ­è·¯å¾„åˆ
+    {
+        least = 0;
+    }
+
+    public int getLength()// å¾—åˆ°æ•°ç»„çš„æœ‰æ•ˆé•¿åº¦
+    {
+        for (int i = 0; i < this.refrence.length; i++) {
+            if (this.refrence[i] == null)
+                return i;
         }
-        
+        return 0;
+    }
+
+    public boolean IfHaveChild(String str)// æ˜¯å¦å­˜åœ¨ç›¸é‚»è¾¹ï¼Œå­˜åœ¨è¿”å›true
+    {
+        for (int i = 0; i < this.getLength(); i++) {
+            if (this.list[this.GetNum(str)][i] > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int GetNum(String str)// é€šè¿‡å­—ç¬¦ä¸²æŸ¥æ‰¾å¯¹åº”çš„ç¼–å·å€¼
+    {
+        for (int j = 0; j < this.getLength(); j++) {
+            if (this.refrence[j] == null)
+                return -1;
+            if (this.refrence[j].equals(str) == true)
+                return j;
+        }
+        return -1;
+    }
+
+    public void Add(int i, int j)// å°†å¯¹åº”çš„ä¸¤ä¸ªç¼–å·çš„æƒå€¼+1ï¼Œè¡¨ç¤ºi->jæœ‰ä¸€æ¡æœ‰å‘è¾¹
+    {
+        this.list[i][j] = this.list[i][j] + 1;
+    }
+
+    public Digraph createDirectedGraph(String filename)// åˆ›å»ºæœ‰å‘å›¾
+    {
+        try // å­˜åœ¨åè¿›è¡Œæ–‡ä»¶æ“ä½œ
+        {
+            File file = new File(filename); // æ–‡ä»¶æ‰“å¼€
+            if (!file.exists())// æ£€éªŒæ˜¯å¦å­˜åœ¨
+            {
+                System.err.println("Not Fing the File!\n");
+            }
+
+            String line;
+            String reg = "\\s+";
+            String E = "[a-zA-Z]";
+            String word, preword = null;
+            int index = 0;
+
+            BufferedReader bf = new BufferedReader(new FileReader(file));
+            while ((line = bf.readLine()) != null) // ä¸€è¡Œä¸€è¡Œè¯»å–
+            {
+                for (int i = 0; i < line.length(); i++) {
+                    char ch = line.charAt(i);
+                    String ch1 = String.valueOf(ch);
+                    if (!ch1.matches(E)) // å°†éè‹±æ–‡å­—æ¯å­—ç¬¦ç”¨ç©ºæ ¼å–ä»£
+                        line = line.replace(ch, ' ');
+
+                }
+                String[] strs = line.split(reg);
+                for (int i = 0; i < strs.length; i++) {
+                    word = strs[i];
+                    if (this.GetNum(word.toLowerCase().trim()) == -1)// å¦‚æœæ²¡æœ‰å‚¨å­˜è¿™ä¸ªå•è¯ï¼Œåˆ™å­˜å…¥
+                    {
+                        this.refrence[index] = (word.toLowerCase().trim());
+                        index++;
+                    } // æœ‰æ•ˆå•è¯å­˜å…¥å‚è€ƒæ•°ç»„ä¸­,åŒæ—¶å¤§å†™è½¬æ¢
+
+                    if (preword != null)// å¦‚æœå‰ä¸€å•è¯ä¸ä¸ºç©ºï¼Œåˆ™å‰ä¸€å•è¯åˆ°æ­¤å•è¯çš„æƒå€¼+1
+                    {
+
+                        this.Add(this.GetNum(preword.toLowerCase().trim()), this.GetNum(word.toLowerCase().trim()));
+                    }
+                    preword = word;
+                    // System.out.println(preword);
+                }
+            }
+            bf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    public void printdigraph(Digraph graphParam)// æµ‹è¯•è¾“å‡º
+    {
+        /* è¾“å‡ºæµ‹è¯•åŒº */
+        int index = graphParam.getLength();
+        System.out.println(index);
+        for (int z = 0; z < index; z++) {
+            System.out.print("\"" + graphParam.refrence[z] + "\"" + ' ');
+        }
+        System.out.print('\n');
+        for (int x = 0; x < index; x++) {
+            for (int y = 0; y < index; y++) {
+                System.out.print(graphParam.list[x][y] + " ");
+            }
+            System.out.println("\n");
+        }
+    }
+
+    public String queryBridgeWords(Digraph graphParam, String word1, String word2)// æŸ¥è¯¢æ¡¥æ¥è¯
+    {
+        int index1 = graphParam.GetNum(word1);
+        int index2 = graphParam.GetNum(word2);
+        if (index1 == -1 || index2 == -1)
+            return "No in"; // è‡³å°‘æœ‰ä¸€ä¸ªè¯ä¸å­˜åœ¨
+        else if (graphParam.list[index1][index2] > 0)
+            return "No have";// ç›¸é‚»ä¸¤è¯æ— æ¡¥æ¥è¯
+        else {
+            ifvisited[index1] = 1;
+            ifvisited[index2] = 1;
+            for (int i = 0; i < graphParam.getLength(); i++)// åˆ¤æ–­æ˜¯å¦ä¸¤è¯é—´æœ‰æ¡¥æ¥è¯
+            {
+                if (graphParam.list[index1][i] > 0) {
+                    if (graphParam.list[i][index2] > 0 && ifvisited[i] == 0)// æœ‰ä¸”æœªè¢«è®¿é—®è¿‡
+                    {
+                        ifvisited[i] = 1;
+                        return graphParam.refrence[i];// è¾“å‡ºæœ‰æ•ˆè¯
+                    }
+                }
+            }
+            for (int j = 0; j < graphParam.getLength(); j++)// åˆ¤æ–­æ˜¯å¦å‡ºç°è¿‡æœ‰æ•ˆè¯
+            {
+                if (ifvisited[j] == 1)
+                    return "No more";// å‡ºç°è¿‡
+            }
+            return "No have";// æœªå‡ºç°è¿‡
+        }
+
+    }
+
+    public String generateNewText(Digraph graphParam, String inputText)// æ ¹æ®bridge wordç”Ÿæˆæ–°æ–‡æœ¬
+    {
+        String[] sentence = inputText.split("\\s+");// åˆ†å‰²è¾“å…¥çš„å­—ç¬¦ä¸²
+        String strout = new String();// æœ€ç»ˆè¾“å‡ºçš„å­—ç¬¦ä¸²
+        String strbridge;// å­˜æ”¾å½“å‰æ¡¥æ¥è¯
+        String strconnect;// å¾—å‡ºçš„æœ‰æ•ˆæ¡¥æ¥è¯
+        for (int i = 0; i < sentence.length - 1; i++) {
+            refreshIfVisited(graphParam.getLength());
+            strout = strout + sentence[i] + " ";
+            strbridge = graphParam.queryBridgeWords(graphParam, sentence[i], sentence[i + 1]);
+            if (strbridge.equals("No in") || strbridge.equals("No have"))
+                strconnect = " ";// å¦‚æœä¸¤è¯é—´æ— æ¡¥æ¥è¯ï¼Œä¸éœ€è¦æ’å…¥æ–°å•è¯
+            else // å¦‚æœä¸¤è¯é—´æœ‰æ¡¥æ¥è¯ï¼Œéšæœºæ’å…¥ä¸€ä¸ªæ¡¥æ¥è¯
+            {
+                String[] bridgewords = new String[graphParam.getLength()];
+                int index = 0;
+                Random random = new Random();
+                while (!strbridge.equals("No more"))// æœªæ‰¾å…¨æ‰€æœ‰æ¡¥æ¥è¯æ—¶
+                {
+                    bridgewords[index] = strbridge;
+                    index++;
+                    strbridge = graphParam.queryBridgeWords(graphParam, sentence[i], sentence[i + 1]);
+                }
+                strconnect = bridgewords[random.nextInt(index)] + " ";
+            }
+            strout = strout + strconnect;
+        }
+        strout = strout + sentence[sentence.length - 1];
+        return strout;
+
+    }
+
+    public String randomWalk(Digraph graphParam)// éšæœºæ¸¸èµ°
+    {
+        int temp;
+        final Random index = new Random();// ç”Ÿæˆä¸€ä¸ªèŒƒå›´å†…çš„éšæœºæ•°
+        temp = index.nextInt(graphParam.getLength());
+        if (IfHaveChild(graphParam.refrence[sign]) == false)
+            return "end";// å½“å‰èŠ‚ç‚¹å·²æ— å­ç»“ç‚¹ï¼Œåˆèµ°æ¸¸èµ°ç»“æŸ
+        if (graphParam.list[sign][temp] > 0 && ifvisited[temp] == 0)// å½“å‰å­—ç¬¦å­˜åœ¨é‚»æ¥å­—ç¬¦å¹¶ä¸”æœªè¢«è®¿é—®
+        {
+            ifvisited[temp] = 1;// æ ‡è®°è®¿é—®
+            // this.sign=temp;
+            // this.refreshtimes();
+            sign = temp;
+            refreshtimes();
+            return graphParam.refrence[temp];// å½“å‰å­—ç¬¦ä¸ºå¯è¾“å‡ºå­—ç¬¦ï¼Œè¿”å›å½“å‰å­—ç¬¦
+        } // this.sign
+        else if (graphParam.list[sign][temp] > 0 && ifvisited[temp] == 1 && (times == 0 || times == 1))// å½“å‰å·²ç»è®¿é—®è¿‡ä½†æœªé‡å¤ï¼Œè¯´æ˜åªå‡ºç°é‡å¤å•è¯ï¼Œæœªå¿…æ˜¯å‡ºç°é‡å¤å¥å­ï¼Œç»§ç»­æ¸¸èµ°
+        {
+            ifvisited[temp] = 1;// æ ‡è®°è®¿é—®
+            sign = temp;
+            times++;
+            return refrence[temp];// å½“å‰å­—ç¬¦ä¸ºå¯è¾“å‡ºå­—ç¬¦ï¼Œè¿”å›å½“å‰å­—ç¬¦
+        } else if (graphParam.list[sign][temp] > 0 && ifvisited[temp] == 1 && times == 2)// å½“å‰å·²ç»è®¿é—®è¿‡å¹¶ä¸”å·²é‡å¤ï¼Œè¯´æ˜å‡ºç°é‡å¤å¥å­ï¼Œæ¸¸èµ°ç»“æŸ
+        {
+            return "end";
+        } else// å½“å‰ç”Ÿæˆéšæœºæ•°ä¸æ˜¯ä¸‹ä¸€å•è¯çš„ä¸‹æ ‡ä½†å½“å‰èµ°åˆ°çš„èŠ‚ç‚¹è¿˜æœ‰å­èŠ‚ç‚¹ï¼Œé‡æ–°æ‰§è¡Œå‡½æ•°ï¼Œç›´åˆ°ç”Ÿæˆæœ‰æ•ˆä¸‹æ ‡
+        {
+            return "continue";
+        }
+    }
+
+    public void showDirectedGraph(Digraph graphParam)// å±•ç¤ºæœ‰å‘å›¾
+    {
+        GraphViz gv = new GraphViz();
+        gv.addln(gv.start_graph());
+        int index = graphParam.getLength();
+        for (int i = 0; i < index; i++) {
+            for (int j = 0; j < index; j++) {
+                if (graphParam.list[i][j] > 0) {
+                    gv.addln(graphParam.refrence[i] + "->" + graphParam.refrence[j] + "[label=\"" + graphParam.list[i][j] + "\"];");
+                    // gv.addln(graphParam.refrence[i]+"->"+graphParam.refrence[j]+"[label=\""+graphParam.list[i][j]+"\",style=\"dashed\"];");
+                }
+            }
+        }
+
         gv.addln(gv.end_graph());
         System.out.println(gv.getDotSource());
-        
+
         String type = "gif";
-        File out = new File("D:/graphviz2.38/workspace/out1."+type);
-        gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
+        File out = new File("/Users/xmh_mac/Documents/JAVA/Lab4/Lab1-1/output." + type);
+        gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
+    }
+
+    // å±•ç¤ºæœ€çŸ­è·¯å¾„
+    public void showShortestRoute(Digraph graphParam, String route)// å±•ç¤ºæœ‰å‘å›¾
+    {
+        String[] routes = route.split("->");
+        int flag;
+        GraphViz gv = new GraphViz();
+        gv.addln(gv.start_graph());
+        int index = graphParam.getLength();
+        for (int i = 0; i < index; i++) {
+            for (int j = 0; j < index; j++) {
+                if (graphParam.list[i][j] > 0) {
+                    // System.out.println(graphParam.list[i][j]);
+
+                    flag = 0;
+                    for (int k = 0; k < routes.length - 1; k++) {
+                        if (graphParam.refrence[i].equals(routes[k]) && graphParam.refrence[j].equals(routes[k + 1])) {
+                            gv.addln(graphParam.refrence[i] + "->" + graphParam.refrence[j] + "[label=\"" + graphParam.list[i][j]
+                                    + "\",style=\"dashed\"];");
+                            flag = 1;
+                            break;
+                        }
+                    }
+                    if (flag == 0) {
+                        gv.addln(graphParam.refrence[i] + "->" + graphParam.refrence[j] + "[label=\"" + graphParam.list[i][j] + "\"];");
+                    }
+
+                }
+            }
+        }
+
+        gv.addln(gv.end_graph());
+        // System.out.println(gv.getDotSource());
+
+        String type = "gif";
+        File out = new File("D:/graphviz2.38/workspace/out2." + type);
+        //gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
+    }
+
+    public String calcShortestPath(Digraph graphParam, String word1, String word2)// è®¡ç®—ä¸¤ä¸ªå•è¯ä¹‹é—´çš„æœ€çŸ­è·¯å¾„
+    {
+
+        int index1 = graphParam.GetNum(word1);
+        int index2 = graphParam.GetNum(word2);
+        if (index1 == -1 || index2 == -1)
+            return "No way";
+        int num = graphParam.getLength();
+        int[][] a = new int[num][num];
+        int[][] path = new int[num][num];
+        int i, j, k, n = num;
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                if (i == j)
+                    a[i][j] = 0;
+                else if (graphParam.list[i][j] == 0) {
+                    a[i][j] = 999;// æ— è·¯å¾„æ—¶æƒå€¼å®šä¹‰ä¸º999
+                }
+                else
+                    a[i][j] = graphParam.list[i][j];
+                path[i][j] = -1;
+            }
+        }
+        for (k = 0; k < n; k++) {
+            for (i = 0; i < n; i++) {
+                for (j = 0; j < n; j++) {
+                    if (a[i][j] > (a[i][k] + a[k][j])) {
+                        a[i][j] = a[i][k] + a[k][j];
+                        path[i][j] = k;
+                    }
+                }
+            }
+        }
+        least = a[index1][index2];// æ›´æ–°æœ€çŸ­è·¯å¾„å€¼
+        String str;
+        str = graphParam.ReturnBetweenWords(path, index1, index2);
+        return str;
+
+    }
+
+    public String ReturnBetweenWords(int[][] a, int index1, int index2)// é€’å½’è¿”å›å­—ç¬¦ä¸²ï¼Œè¾…åŠ©å‡½æ•°
+    {
+        if (a[index1][index2] == -1)
+            return this.refrence[index1] + "->";
+        else
+            return this.ReturnBetweenWords(a, index1, a[index1][index2])
+                    + this.ReturnBetweenWords(a, a[index1][index2], index2);
     }
     
-    //Õ¹Ê¾×î¶ÌÂ·¾¶
-    public void showShortestRoute(digraph G, String route)//Õ¹Ê¾ÓĞÏòÍ¼
-    {
-    	String []routes=route.split("->");
-    	int flag;
-    	GraphViz gv = new GraphViz();
-        gv.addln(gv.start_graph());
-        int index=G.GetLength();
-        for(int i=0;i<index;i++)
+    public void PackageRandomWanderByXmhWnz(Digraph graphParam) {
+        String result = new String();
+        while (!"end".equals(result))// æœªå‡ºç°ç»“æŸæ ‡å¿—æ—¶
         {
-        	for(int j=0;j<index;j++)
-        	{
-        		if(G.list[i][j]>0)
-        		{
-        			//System.out.println(G.list[i][j]);
-        		    
-        		    flag=0;
-        		    for(int k=0;k<routes.length-1;k++)
-        		    {
-        		    	if(G.refrence[i].equals(routes[k])&&G.refrence[j].equals(routes[k+1]))
-        		    	{
-        		    		 gv.addln(G.refrence[i]+"->"+G.refrence[j]+"[label=\""+G.list[i][j]+"\",style=\"dashed\"];");
-        		    		 flag=1;
-        		    		 break;
-        		    	}
-        		    }
-        		    if(flag==0)
-        		    {
-        		    	 gv.addln(G.refrence[i]+"->"+G.refrence[j]+"[label=\""+G.list[i][j]+"\"];");
-        		    }
-        		    
-        		}
-        	}
+            int temp;
+            final Random index = new Random();// ç”Ÿæˆä¸€ä¸ªèŒƒå›´å†…çš„éšæœºæ•°
+            temp = index.nextInt(graphParam.getLength());
+            if (IfHaveChild(graphParam.refrence[sign]) == false)
+                result = "end";// å½“å‰èŠ‚ç‚¹å·²æ— å­ç»“ç‚¹ï¼Œåˆèµ°æ¸¸èµ°ç»“æŸ
+            if (graphParam.list[sign][temp] > 0 && ifvisited[temp] == 0)// å½“å‰å­—ç¬¦å­˜åœ¨é‚»æ¥å­—ç¬¦å¹¶ä¸”æœªè¢«è®¿é—®
+            {
+                ifvisited[temp] = 1;// æ ‡è®°è®¿é—®
+                // this.sign=temp;
+                // this.refreshtimes();
+                sign = temp;
+                refreshtimes();
+                result = graphParam.refrence[temp];// å½“å‰å­—ç¬¦ä¸ºå¯è¾“å‡ºå­—ç¬¦ï¼Œè¿”å›å½“å‰å­—ç¬¦
+            } // this.sign
+            else if (graphParam.list[sign][temp] > 0 && ifvisited[temp] == 1 && (times == 0 || times == 1))// å½“å‰å·²ç»è®¿é—®è¿‡ä½†æœªé‡å¤ï¼Œè¯´æ˜åªå‡ºç°é‡å¤å•è¯ï¼Œæœªå¿…æ˜¯å‡ºç°é‡å¤å¥å­ï¼Œç»§ç»­æ¸¸èµ°
+            {
+                ifvisited[temp] = 1;// æ ‡è®°è®¿é—®
+                sign = temp;
+                times++;
+                result = refrence[temp];// å½“å‰å­—ç¬¦ä¸ºå¯è¾“å‡ºå­—ç¬¦ï¼Œè¿”å›å½“å‰å­—ç¬¦
+            } else if (graphParam.list[sign][temp] > 0 && ifvisited[temp] == 1 && times == 2)// å½“å‰å·²ç»è®¿é—®è¿‡å¹¶ä¸”å·²é‡å¤ï¼Œè¯´æ˜å‡ºç°é‡å¤å¥å­ï¼Œæ¸¸èµ°ç»“æŸ
+            {
+                result = "end";
+            } else// å½“å‰ç”Ÿæˆéšæœºæ•°ä¸æ˜¯ä¸‹ä¸€å•è¯çš„ä¸‹æ ‡ä½†å½“å‰èµ°åˆ°çš„èŠ‚ç‚¹è¿˜æœ‰å­èŠ‚ç‚¹ï¼Œé‡æ–°æ‰§è¡Œå‡½æ•°ï¼Œç›´åˆ°ç”Ÿæˆæœ‰æ•ˆä¸‹æ ‡
+            {
+                result = "continue";
+            }
+            if (!result.equals("continue") && !result.equals("end")) {
+                System.out.print(result + " ");// å½“å¾—åˆ°æœ‰æ•ˆè¾“å‡ºæ—¶ï¼Œè¾“å‡ºå­—ç¬¦}
+            }
         }
         
-        gv.addln(gv.end_graph());
-     //   System.out.println(gv.getDotSource());
-        
-        String type = "gif";
-        File out = new File("D:/graphviz2.38/workspace/out2."+type);
-        gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
     }
-    
-    public String calcShortestPath(digraph G, String word1, String word2)//¼ÆËãÁ½¸öµ¥´ÊÖ®¼äµÄ×î¶ÌÂ·¾¶ 
-    {
-    	int num=G.GetLength();
-        int index1=G.GetNum(word1);int index2=G.GetNum(word2);
-        if(index1==-1||index2==-1) return "No way";
-    	   int[][] A=new int[num][num];
-    	   int[][] path=new int [num][num];
-    	   int i,j,k,n=num;
-    	   for(i=0;i<n;i++)
-    	   {
-    		   for(j=0;j<n;j++)
-    		   {   if(i==j) A[i][j]=0;
-    		   else if(G.list[i][j]==0) A[i][j]=999;//ÎŞÂ·¾¶Ê±È¨Öµ¶¨ÒåÎª999 
-    		   else A[i][j]=G.list[i][j];
-    			   path[i][j]=-1;
-    		   }
-    	   }
-    	  for(k=0;k<n;k++)
-    	  {
-    		  for(i=0;i<n;i++)
-    		  {
-    			  for(j=0;j<n;j++)
-    			  {
-    				  if(A[i][j]>(A[i][k]+A[k][j]))
-    				  {
-    					  A[i][j]=A[i][k]+A[k][j];
-    					  path[i][j]=k;
-    				  }
-    			  }
-    		  }
-    	  }
-    	  least=A[index1][index2];//¸üĞÂ×î¶ÌÂ·¾¶Öµ
-    	  String str;
-    	  str=G.ReturnBetweenWords(path, index1, index2);
-    	  return str;
-    	  
-    	  
-    }
-    public String ReturnBetweenWords(int[][] A,int index1,int index2)//µİ¹é·µ»Ø×Ö·û´®£¬¸¨Öúº¯Êı
-    {
-    	if(A[index1][index2]==-1) return this.refrence[index1]+"->";
-    	else return this.ReturnBetweenWords(A, index1, A[index1][index2])+this.ReturnBetweenWords(A,A[index1][index2], index2);
-    	}
 }
+
 public class Lab1 {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		 Scanner input=new Scanner(System.in);
-        String filename=new String("D:\\graphviz2.38\\workspace\\test.txt");
-        String str1,str2,str3;
-        digraph nl=new digraph(100);//¶¨ÒåĞÂµÄÓĞÏòÍ¼Àà,Í¬Ê±³õÊ¼»¯¶şÎ¬¾ØÕó
-        nl=nl.createDirectedGraph(filename);//´´½¨ÓĞÏòÍ¼
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        Scanner input = new Scanner(System.in);
+        String filename = new String("/Users/xmh_mac/Documents/JAVA/Lab4/Lab1-1/myfile.txt");
+        String str1, str2, str3;
+        final int sizeOfVector = 100;
+        Digraph nl = new Digraph(sizeOfVector);// å®šä¹‰æ–°çš„æœ‰å‘å›¾ç±»,åŒæ—¶åˆå§‹åŒ–äºŒç»´çŸ©é˜µ
+        nl = nl.createDirectedGraph(filename);// åˆ›å»ºæœ‰å‘å›¾
         nl.printdigraph(nl);
-        nl.showDirectedGraph(nl);
-        /*²éÑ¯ÇÅ½Ó´Ê*/
+        //nl.showDirectedGraph(nl);
+        /* æŸ¥è¯¢æ¡¥æ¥è¯ */
         System.out.println("Please input the words you want to search: ");
-        str1=input.next();
+        str1 = input.next();
         input.nextLine();
-        str2=input.next();
+        str2 = input.next();
         input.nextLine();
-        digraph.refreshifvisited(nl.GetLength());   
-        str3=nl.queryBridgeWords(nl, str1, str2);       
-        if(str3.equals("No in")) System.out.println("No \""+str1+"\" or \""+str2+"\" in the graph !");
-        else if(str3.equals("No have")) System.out.println("No bridge words from \""+str1+"\" to \""+str2+"\" !");
-        else 
-        {
-        	System.out.print("The bridge words from \""+str1+"\" to \""+str2+"\" are :"+str3);
-        	 str3=nl.queryBridgeWords(nl, str1, str2);    
-        	while(!str3.equals("No more")) 
-        	{        		
-        		String str4=new String(nl.queryBridgeWords(nl, str1, str2));        		
-        		if(!str3.equals("No more")&&!str4.equals("No more")) 
-        			{System.out.print(","+str3);str3=str4;}
-        		else if(!str3.equals("No more")&&str4.equals("No more"))
-        			{System.out.print(" and "+str3);str3=str4;}
-        	}
+        Digraph.refreshIfVisited(nl.getLength());
+        str3 = nl.queryBridgeWords(nl, str1, str2);
+        if (str3.equals("No in"))
+            System.out.println("No \"" + str1 + "\" or \"" + str2 + "\" in the graph !");
+        else if (str3.equals("No have"))
+            System.out.println("No bridge words from \"" + str1 + "\" to \"" + str2 + "\" !");
+        else {
+            System.out.print("The bridge words from \"" + str1 + "\" to \"" + str2 + "\" are :" + str3);
+            str3 = nl.queryBridgeWords(nl, str1, str2);
+            while (!str3.equals("No more")) {
+                String str4 = new String(nl.queryBridgeWords(nl, str1, str2));
+                if (!str3.equals("No more") && !str4.equals("No more")) {
+                    System.out.print("," + str3);
+                    str3 = str4;
+                } else if (!str3.equals("No more") && str4.equals("No more")) {
+                    System.out.print(" and " + str3);
+                    str3 = str4;
+                }
+            }
         }
         System.out.println("\n**********************************************");
-        /*Ëæ»úÓÎ×ß*/
+        /* éšæœºæ¸¸èµ° */
         System.out.println("Now begin the random waklind.");
-        Random random=new Random();
-        String result=new String();
-        //String strin=new String("Yes");//ÊäÈë×Ö·û£¬ÅĞ¶ÏÊÇ·ñ¼ÌĞø±éÀú
-        digraph.sign=random.nextInt(nl.GetLength());//Éú³ÉÒ»¸ö³õÊ¼ÓÎ×ßÎ»ÖÃ
-        digraph.refreshifvisited(nl.GetLength());
-        digraph.refreshtimes();
-        digraph.ifvisited[digraph.sign]=1;//±ê¼ÇÎªÒÑ·ÃÎÊ
-        System.out.print(nl.refrence[digraph.sign]+" ");
-        while(!result.equals("end"))//Î´³öÏÖ½áÊø±êÖ¾Ê±
-        {    result=nl.randomWalk(nl);
-        	if(!result.equals("continue")&&!result.equals("end")) 
-        	{
-        		System.out.print(result+" ");//µ±µÃµ½ÓĞĞ§Êä³öÊ±£¬Êä³ö×Ö·û}
-        		} }
-       /* while(!result.equals("end")&&!strin.equals("No"))//Î´³öÏÖ½áÊø±êÖ¾Ê±
-        {    result=nl.randomWalk(nl);
-             if(!strin.equals("Yes")&&!strin.equals("No"))
-             {
-            	 System.out.println("Wrong inputs!");
-            	 break;
-             }        
-        	if(!result.equals("continue")&&!result.equals("end")&&strin.equals("Yes")) 
-        	{
-        		System.out.print(result+" \n");//µ±µÃµ½ÓĞĞ§Êä³öÊ±£¬Êä³ö×Ö·û}
-        		System.out.println("Would you like to continue ?(inout Yes to continue, No to stop)");
-        		strin=input.next();}        		             
-        }*/
+        Random random = new Random();
+        // String strin=new String("Yes");//è¾“å…¥å­—ç¬¦ï¼Œåˆ¤æ–­æ˜¯å¦ç»§ç»­éå†
+        Digraph.sign = random.nextInt(nl.getLength());// ç”Ÿæˆä¸€ä¸ªåˆå§‹æ¸¸èµ°ä½ç½®
+        Digraph.refreshIfVisited(nl.getLength());
+        Digraph.refreshtimes();
+        Digraph.ifvisited[Digraph.sign] = 1;// æ ‡è®°ä¸ºå·²è®¿é—®
+        System.out.print(nl.refrence[Digraph.sign] + " ");
+        nl.PackageRandomWanderByXmhWnz(nl);
+        /*
+         * while(!result.equals("end")&&!strin.equals("No"))//æœªå‡ºç°ç»“æŸæ ‡å¿—æ—¶ {
+         * result=nl.randomWalk(nl); if(!strin.equals("Yes")&&!strin.equals("No")) {
+         * System.out.println("Wrong inputs!"); break; }
+         * if(!result.equals("continue")&&!result.equals("end")&&strin.equals("Yes")) {
+         * System.out.print(result+" \n");//å½“å¾—åˆ°æœ‰æ•ˆè¾“å‡ºæ—¶ï¼Œè¾“å‡ºå­—ç¬¦} System.out.
+         * println("Would you like to continue ?(inout Yes to continue, No to stop)");
+         * strin=input.next();} }
+         */
         System.out.println("\nComplete random walk!");
         System.out.println("**********************************************");
-        /*¸ù¾İbridgewordsÉú³ÉĞÂÎÄ±¾*/
+        /* æ ¹æ®bridgewordsç”Ÿæˆæ–°æ–‡æœ¬ */
         System.out.println("Please input the new text: ");
-        String inputText=new String(input.nextLine());
+        String inputText = new String(input.nextLine());
         System.out.println(nl.generateNewText(nl, inputText));
         System.out.println("**********************************************");
-        /*×î¶ÌÂ·¾¶ËÑË÷*/
+        /* æœ€çŸ­è·¯å¾„æœç´¢ */
         System.out.println("Please input the words you want to search for the least cost: ");
-        String str5,str6,str7;
-        str5=input.next();
-        str6=input.next();
-        digraph.refreshleast();
-        String strcheapestroute=new String();
-        strcheapestroute=nl.calcShortestPath(nl, str5, str6);
-        if(strcheapestroute.equals("No way"))//Èç¹ûÂ·¾¶²»´æÔÚ
+        String str5, str6, str7;
+        str5 = input.next();
+        str6 = input.next();
+        Digraph.refreshleast();
+        String strcheapestroute;
+        strcheapestroute = nl.calcShortestPath(nl, str5, str6);
+        if (strcheapestroute.equals("No way"))// å¦‚æœè·¯å¾„ä¸å­˜åœ¨
         {
-        	System.out.println("No route bewteen the words!");
+            System.out.println("No route bewteen the words!");
+        } else {
+            System.out.println("The least cost way is :" + strcheapestroute + str6);
+            nl.showShortestRoute(nl, strcheapestroute + str6);
+            System.out.println("The least cost is: " + Digraph.least);
         }
-        else{
-        System.out.println("The least cost way is :"+strcheapestroute+str6);
-        nl.showShortestRoute(nl,strcheapestroute+str6);
-        System.out.println("The least cost is: " +digraph.least);}
         System.out.println("**********************************************");
-        
-        //µ¥Ô´×î¶ÌÂ·¾¶
+
+        // å•æºæœ€çŸ­è·¯å¾„
         System.out.println("Please input a word you want to search for the least cost: ");
-        str7=input.next();
-        int index=nl.GetNum(str7);
-        for(int i=0;i<nl.GetLength();i++)
-        {
-        	if(i!=index)
-        	{
-        digraph.refreshleast();
-        String strcheapestroute1=new String();
-        strcheapestroute1=nl.calcShortestPath(nl, str7,nl.refrence[i]);
-        if(strcheapestroute1.equals("No way"))//Èç¹ûÂ·¾¶²»´æÔÚ
-        {
-        	System.out.println("No route bewteen the words!");
-        }
-        else{
-        System.out.println("The least cost way is :"+strcheapestroute1+nl.refrence[i]);
-       // nl.showShortestRoute(nl,strcheapestroute1+str6);
-        System.out.println("The least cost is: " +digraph.least);}
-        System.out.println("**********************************************");
-        	}
+        str7 = input.next();
+        int index = nl.GetNum(str7);
+        for (int i = 0; i < nl.getLength(); i++) {
+            if (i != index) {
+                Digraph.refreshleast();
+                String strcheapestroute1 = new String();
+                strcheapestroute1 = nl.calcShortestPath(nl, str7, nl.refrence[i]);
+                if (strcheapestroute1.equals("No way"))// å¦‚æœè·¯å¾„ä¸å­˜åœ¨
+                {
+                    System.out.println("No route bewteen the words!");
+                } else {
+                    System.out.println("The least cost way is :" + strcheapestroute1 + nl.refrence[i]);
+                    // nl.showShortestRoute(nl,strcheapestroute1+str6);
+                    System.out.println("The least cost is: " + Digraph.least);
+                }
+                System.out.println("**********************************************");
+            }
         }
         input.close();
-     //   System.out.println("\nHello World!");
-     
+        // System.out.println("\nHello World!");
 
-	}
+    }
 
 }

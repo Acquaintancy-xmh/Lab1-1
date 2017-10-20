@@ -1,0 +1,64 @@
+Found a 6 line (66 tokens) duplication in the following files: 
+Starting at line 298 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 323 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+
+        GraphViz gv = new GraphViz();
+        gv.addln(gv.start_graph());
+        int index = graphParam.GetLength();
+        for (int i = 0; i < index; i++) {
+            for (int j = 0; j < index; j++) {
+                if (graphParam.list[i][j] > 0) {
+=====================================================================
+Found a 6 line (40 tokens) duplication in the following files: 
+Starting at line 303 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 340 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+
+                if (graphParam.list[i][j] > 0) {
+                    gv.addln(graphParam.refrence[i] + "->" + graphParam.refrence[j] + "[label=\"" + graphParam.list[i][j] + "\"];");
+                    // gv.addln(graphParam.refrence[i]+"->"+graphParam.refrence[j]+"[label=\""+graphParam.list[i][j]+"\",style=\"dashed\"];");
+                }
+            }
+        }
+=====================================================================
+Found a 2 line (34 tokens) duplication in the following files: 
+Starting at line 303 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 333 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 340 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+
+                if (graphParam.list[i][j] > 0) {
+                    gv.addln(graphParam.refrence[i] + "->" + graphParam.refrence[j] + "[label=\"" + graphParam.list[i][j] + "\"];");
+=====================================================================
+Found a 4 line (31 tokens) duplication in the following files: 
+Starting at line 203 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 359 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+
+        int index1 = graphParam.GetNum(word1);
+        int index2 = graphParam.GetNum(word2);
+        if (index1 == -1 || index2 == -1)
+            return "No in"; // 至少有一个词不存在
+=====================================================================
+Found a 3 line (27 tokens) duplication in the following files: 
+Starting at line 279 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 286 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+
+            return graphParam.refrence[temp];// 当前字符为可输出字符，返回当前字符
+        } // this.sign
+        else if (graphParam.list[sign][temp] > 0 && ifvisited[temp] == 1 && (times == 0 || times == 1))// 当前已经访问过但未重复，说明只出现重复单词，未必是出现重复句子，继续游走
+=====================================================================
+Found a 3 line (26 tokens) duplication in the following files: 
+Starting at line 366 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 378 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                if (i == j)
+=====================================================================
+Found a 5 line (26 tokens) duplication in the following files: 
+Starting at line 484 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+Starting at line 503 of /Users/abc123one/Downloads/Lab4/Lab1-1/src/Lab1.java
+
+        if (strcheapestroute.equals("No way"))// 如果路径不存在
+        {
+            System.out.println("No route bewteen the words!");
+        } else {
+            System.out.println("The least cost way is :" + strcheapestroute + str6);

@@ -62,13 +62,12 @@ public class GraphViz
    {
       File dot;
       byte[] img_stream = null;
-   
       try {
          dot = writeDotSourceToFile(dot_source);
          if (dot != null)
          {
             img_stream = get_img_stream(dot, type);
-            if (dot.delete() == false) 
+            if (!dot.delete()) 
                System.err.println("Warning: " + dot.getAbsolutePath() + " could not be deleted!");
             return img_stream;
          }
